@@ -4,19 +4,17 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "smtps")
 public class Smtp extends BaseEntity {
-
-    @Column(nullable = false, unique = true, updatable = false)
-    private String code;
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;

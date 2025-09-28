@@ -1,13 +1,12 @@
 package com.akn.ns.neighbour_snack_be.service;
 
 import com.akn.ns.neighbour_snack_be.dto.EmailRequestDto;
+import com.akn.ns.neighbour_snack_be.dto.PaginationResponse;
+import com.akn.ns.neighbour_snack_be.dto.SmtpDto;
 import com.akn.ns.neighbour_snack_be.dto.SmtpDto.SmtpRequestDto;
 import com.akn.ns.neighbour_snack_be.dto.SmtpDto.SmtpResponseDto;
-import com.akn.ns.neighbour_snack_be.dto.SmtpDto.SmtpToggleRequestDto;
 import com.akn.ns.neighbour_snack_be.entity.Smtp;
 import com.akn.ns.neighbour_snack_be.utility.EmailTemplate;
-
-import java.util.List;
 
 public interface SmtpService {
 
@@ -17,13 +16,13 @@ public interface SmtpService {
 
     void deleteSmtp(String code);
 
-    List<SmtpResponseDto> getAllSmtps();
+    PaginationResponse<SmtpResponseDto> getAllSmtps(SmtpDto.SmtpFilterRequest smtpFilterRequest);
 
     SmtpResponseDto getSmtpByCode(String code);
 
     SmtpResponseDto getActiveSmtp();
 
-    SmtpResponseDto toggleSmtpStatus(String code, SmtpToggleRequestDto smtpToggleRequestDto);
+    SmtpResponseDto toggleSmtpStatus(String code);
 
     Smtp getActiveSmtpEntity();
 

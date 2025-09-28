@@ -2,6 +2,7 @@ package com.akn.ns.neighbour_snack_be.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.io.Serial;
@@ -17,7 +18,7 @@ import static org.hibernate.type.SqlTypes.JSON;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "customers")
 public class Customer extends BaseEntity {

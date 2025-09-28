@@ -3,6 +3,7 @@ package com.akn.ns.neighbour_snack_be.dto;
 import com.akn.ns.neighbour_snack_be.entity.Smtp;
 import com.akn.ns.neighbour_snack_be.utility.AppUtil;
 import jakarta.validation.constraints.*;
+import lombok.Data;
 
 import java.time.ZonedDateTime;
 
@@ -11,6 +12,17 @@ import static com.akn.ns.neighbour_snack_be.utility.AppConstant.MIN_STRING_DEFAU
 import static com.akn.ns.neighbour_snack_be.utility.AppUtil.generateCode;
 
 public class SmtpDto {
+
+    @Data
+    public static class SmtpFilterRequest {
+
+        private String keyword; // search by name, host, username etc.
+        private int page = 0; // page number, default 0
+        private int size = 10; // page size, default 10
+        private String sortBy = "updatedAt"; // default sort column
+        private String sortDir = "desc"; // default sort direction
+
+    }
 
     public record SmtpRequestDto(
             @NotBlank(message = "{smtp.name.required}")
@@ -92,9 +104,6 @@ public class SmtpDto {
                     smtp.getUpdatedAt()
             );
         }
-    }
-
-    public record SmtpToggleRequestDto(boolean isActive) {
     }
 
 }

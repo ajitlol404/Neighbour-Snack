@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import static jakarta.persistence.EnumType.STRING;
 
@@ -13,13 +14,10 @@ import static jakarta.persistence.EnumType.STRING;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {
-
-    @Column(nullable = false, unique = true, updatable = false)
-    private String code;
 
     @Column(nullable = false, length = 50)
     private String name;

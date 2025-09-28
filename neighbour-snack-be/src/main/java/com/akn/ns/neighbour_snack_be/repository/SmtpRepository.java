@@ -2,14 +2,16 @@ package com.akn.ns.neighbour_snack_be.repository;
 
 import com.akn.ns.neighbour_snack_be.entity.Smtp;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface SmtpRepository extends JpaRepository<Smtp, UUID> {
+public interface SmtpRepository extends JpaRepository<Smtp, UUID>, JpaSpecificationExecutor<Smtp> {
 
     boolean existsByName(String name);
 
@@ -19,6 +21,7 @@ public interface SmtpRepository extends JpaRepository<Smtp, UUID> {
     }
 
     @Modifying
+    @Transactional
     @Query("UPDATE Smtp s SET s.isActive = false WHERE s.isActive = true")
     void deactivateAll();
 

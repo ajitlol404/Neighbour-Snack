@@ -1,7 +1,9 @@
 package com.akn.ns.neighbour_snack_be.service.impl;
 
 import com.akn.ns.neighbour_snack_be.dto.EmailRequestDto;
+import com.akn.ns.neighbour_snack_be.dto.PaginationResponse;
 import com.akn.ns.neighbour_snack_be.dto.SmtpDto;
+import com.akn.ns.neighbour_snack_be.dto.SmtpDto.SmtpFilterRequest;
 import com.akn.ns.neighbour_snack_be.dto.SmtpDto.SmtpResponseDto;
 import com.akn.ns.neighbour_snack_be.entity.Smtp;
 import com.akn.ns.neighbour_snack_be.exception.SmtpException;
@@ -11,7 +13,13 @@ import com.akn.ns.neighbour_snack_be.utility.AppUtil;
 import com.akn.ns.neighbour_snack_be.utility.EmailTemplate;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -86,10 +94,32 @@ public class SmtpServiceImpl implements SmtpService {
     }
 
     @Override
-    public List<SmtpResponseDto> getAllSmtps() {
-        return smtpRepository.findAll().stream()
+    public PaginationResponse<SmtpResponseDto> getAllSmtps(SmtpFilterRequest smtpFilterRequest) {
+        Pageable pageable = PageRequest.of(
+                smtpFilterRequest.getPage(),
+                smtpFilterRequest.getSize(),
+                Sort.by(Sort.Direction.fromString(smtpFilterRequest.getSortDir()), smtpFilterRequest.getSortBy())
+        );
+
+        Page<Smtp> pageResult = smtpRepository.findAll(
+                withFilters(smtpFilterRequest.getKeyword()),
+                pageable
+        );
+
+        List<SmtpResponseDto> content = pageResult.getContent().stream()
                 .map(SmtpResponseDto::fromEntity)
                 .toList();
+
+        return new PaginationResponse<>(
+                content,
+                pageResult.getNumber(),
+                pageResult.getSize(),
+                pageResult.getTotalElements(),
+                pageResult.getTotalPages(),
+                pageResult.isLast(),
+                smtpFilterRequest.getSortBy(),
+                smtpFilterRequest.getSortDir()
+        );
     }
 
     @Override
@@ -103,20 +133,22 @@ public class SmtpServiceImpl implements SmtpService {
     }
 
     @Override
-    public SmtpResponseDto toggleSmtpStatus(String code, SmtpDto.SmtpToggleRequestDto smtpToggleRequestDto) {
+    public SmtpResponseDto toggleSmtpStatus(String code) {
         Smtp smtp = smtpRepository.findSmtpByCode(code);
-        boolean isActive = smtpToggleRequestDto.isActive();
+
+        boolean currentStatus = smtp.isActive();
+        boolean newStatus = !currentStatus;
 
         // Prevent disabling the only active SMTP
-        if (!isActive && smtp.isActive() && smtpRepository.countByIsActiveTrue() == 1) {
+        if (!newStatus && currentStatus && smtpRepository.countByIsActiveTrue() == 1) {
             throw new SmtpException("Cannot disable the only active SMTP configuration");
         }
 
-        if (isActive && !smtp.isActive()) {
-            smtpRepository.deactivateAll();
+        if (newStatus) {
+            smtpRepository.deactivateAll(); // deactivate all if enabling this one
         }
 
-        smtp.setActive(isActive);
+        smtp.setActive(newStatus);
 
         return SmtpResponseDto.fromEntity(smtpRepository.save(smtp));
     }
@@ -226,6 +258,25 @@ public class SmtpServiceImpl implements SmtpService {
         properties.put(MAIL_SMTP_WRITETIMEOUT, String.valueOf(SMTP_TIMEOUT_MS));
 
         return mailSender;
+    }
+
+    private Specification<Smtp> withFilters(String keyword) {
+        return (root, query, cb) -> {
+            Predicate predicate = cb.conjunction();
+
+            if (keyword != null && !keyword.isEmpty()) {
+                String likePattern = "%" + keyword.toLowerCase() + "%";
+                Predicate keywordPredicate = cb.or(
+                        cb.like(cb.lower(root.get("code")), likePattern),
+                        cb.like(cb.lower(root.get("name")), likePattern),
+                        cb.like(cb.lower(root.get("host")), likePattern),
+                        cb.like(cb.lower(cb.function("TO_CHAR", String.class, root.get("updatedAt"), cb.literal("YYYY-MM-DD HH24:MI:SS"))), likePattern)
+                );
+                predicate = cb.and(predicate, keywordPredicate);
+            }
+
+            return predicate;
+        };
     }
 
 }

@@ -29,7 +29,7 @@ public class AppUtil {
     }
 
     public static String generateCode(String prefix) {
-        return prefix + "_" + AppUtil.generateRandomString(UPPERCASE_CHARACTERS + NUMERIC_CHARACTERS);
+        return prefix + "-" + AppUtil.generateRandomString(UPPERCASE_CHARACTERS + NUMERIC_CHARACTERS);
     }
 
     public static String generateRandomString(String characterSet) {
