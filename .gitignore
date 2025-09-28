@@ -1,0 +1,36 @@
+# -------------------------
+# React / Node (Frontend)
+# -------------------------
+neighbour-snack-fe/node_modules/
+neighbour-snack-fe/build/
+neighbour-snack-fe/.pnp
+neighbour-snack-fe/.pnp.js
+neighbour-snack-fe/coverage/
+neighbour-snack-fe/.env
+neighbour-snack-fe/.eslintcache
+
+# -------------------------
+# Spring Boot / Java (Backend)
+# -------------------------
+neighbour-snack-be/target/
+neighbour-snack-be/.gradle/
+neighbour-snack-be/build/
+neighbour-snack-be/*.iml
+neighbour-snack-be/.classpath
+neighbour-snack-be/.project
+neighbour-snack-be/.settings/
+neighbour-snack-be/.idea/
+neighbour-snack-be/*.log
+
+# -------------------------
+# System / OS files
+# -------------------------
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# IDE / Editors
+# -------------------------
+.vscode/
+.idea/
+*.swp
