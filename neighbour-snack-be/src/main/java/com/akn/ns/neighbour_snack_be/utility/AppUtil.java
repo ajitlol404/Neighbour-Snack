@@ -28,6 +28,10 @@ public class AppUtil {
         return result.toString();
     }
 
+    public static String generateCode(String prefix) {
+        return prefix + "_" + AppUtil.generateRandomString(UPPERCASE_CHARACTERS + NUMERIC_CHARACTERS);
+    }
+
     public static String generateRandomString(String characterSet) {
         return generateRandomString(characterSet, 4);
     }

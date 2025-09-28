@@ -26,7 +26,6 @@ public class Customer extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
-    @Column
     private LocalDate dateOfBirth;
 
     @JdbcTypeCode(JSON)
