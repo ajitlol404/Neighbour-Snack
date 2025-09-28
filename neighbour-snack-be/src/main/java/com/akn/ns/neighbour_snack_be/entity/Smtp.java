@@ -15,6 +15,9 @@ import lombok.*;
 @Table(name = "smtps")
 public class Smtp extends BaseEntity {
 
+    @Column(nullable = false, unique = true, updatable = false)
+    private String code;
+
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 

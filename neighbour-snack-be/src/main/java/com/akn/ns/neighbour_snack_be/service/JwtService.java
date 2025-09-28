@@ -1,103 +1,21 @@
 package com.akn.ns.neighbour_snack_be.service;
 
-import com.akn.ns.neighbour_snack_be.entity.User;
-import com.akn.ns.neighbour_snack_be.security.CustomUserDetails;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
-import javax.crypto.SecretKey;
-import java.util.*;
+import java.util.List;
 import java.util.function.Function;
 
-@Service
-public class JwtService {
+public interface JwtService {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
+    String extractUsername(String token);
 
-    @Value("${jwt.expiration.ms}")
-    private long jwtExpiration;
+    <T> T extractClaim(String token, Function<Claims, T> claimsResolver);
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
+    String generateToken(UserDetails userDetails);
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
+    List<String> extractRoles(String token);
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-
-        if (userDetails instanceof CustomUserDetails customUserDetails) {
-            User user = customUserDetails.getUser();
-            claims.put("code", user.getCode());
-            claims.put("name", user.getName());
-        }
-
-        // Extract authorities (roles) from UserDetails
-        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
-        if (!authorities.isEmpty()) {
-            claims.put("roles", authorities.stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList());
-        }
-
-        return buildToken(claims, userDetails, jwtExpiration);
-    }
-
-    private String buildToken(
-            Map<String, Object> extraClaims,
-            UserDetails userDetails,
-            long expiration
-    ) {
-        return Jwts
-                .builder()
-                .claims(extraClaims)
-                .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSignInKey(), Jwts.SIG.HS256)
-                .compact();
-    }
-
-    public List<String> extractRoles(String token) {
-        Claims claims = extractAllClaims(token);
-        return claims.get("roles", List.class);
-    }
-
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    private Date extractExpiration(String token) {
-        return extractClaim(token, Claims::getExpiration);
-    }
-
-    private Claims extractAllClaims(String token) {
-        return Jwts
-                .parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
-    }
-
-    private SecretKey getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+    boolean isTokenValid(String token, UserDetails userDetails);
 
 }

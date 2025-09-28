@@ -3,6 +3,7 @@ package com.akn.ns.neighbour_snack_be.service.impl;
 import com.akn.ns.neighbour_snack_be.dto.AuthDto;
 import com.akn.ns.neighbour_snack_be.dto.JwtResponseDto;
 import com.akn.ns.neighbour_snack_be.entity.User;
+import com.akn.ns.neighbour_snack_be.entity.User.Role;
 import com.akn.ns.neighbour_snack_be.repository.UserRepository;
 import com.akn.ns.neighbour_snack_be.security.CustomUserDetails;
 import com.akn.ns.neighbour_snack_be.service.AuthService;
@@ -52,9 +53,9 @@ public class AuthServiceImpl implements AuthService {
             throw new IllegalArgumentException("Phone number is already in use");
         }
 
-        User.Role role;
+        Role role;
         try {
-            role = User.Role.valueOf("ROLE_" + signUpRequestDto.role().toUpperCase());
+            role = Role.valueOf("ROLE_" + signUpRequestDto.role().toUpperCase());
         } catch (Exception e) {
             role = ROLE_CUSTOMER; // default role
         }
@@ -70,7 +71,7 @@ public class AuthServiceImpl implements AuthService {
         return AuthDto.SignUpResponseDto.fromEntity(savedUser);
     }
 
-    private String getPrefixForRole(User.Role role) {
+    private String getPrefixForRole(Role role) {
         return switch (role) {
             case ROLE_ADMIN -> "ADM";
             case ROLE_CUSTOMER -> "CUS";

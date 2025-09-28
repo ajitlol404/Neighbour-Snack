@@ -13,7 +13,14 @@ import static java.lang.Boolean.TRUE;
 
 public class AuthDto {
 
-    public record SignInRequestDto(String email, String password) {
+    public record SignInRequestDto(
+            @NotBlank(message = "{auth.signin.email.required}")
+            @Email(message = "{auth.signin.email.invalid}")
+            String email,
+
+            @NotBlank(message = "{auth.signin.password.required}")
+            String password
+    ) {
     }
 
     public record SignUpRequestDto(

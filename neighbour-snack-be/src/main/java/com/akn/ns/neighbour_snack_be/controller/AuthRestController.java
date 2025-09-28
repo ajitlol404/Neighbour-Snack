@@ -15,10 +15,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.akn.ns.neighbour_snack_be.utility.AppConstant.BASE_API_PATH;
 import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping(BASE_API_PATH + "/auth")
 @RequiredArgsConstructor
 public class AuthRestController {
 
